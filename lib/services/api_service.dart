@@ -1,9 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants/api_constants.dart';
 
 class ApiService {
-  static Future<Map<String, dynamic>> post(String url, Map body, {String? token}) async {
+  static Future<Map<String, dynamic>> get(String url, {String? token}) async {
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(Uri.parse(url), headers: headers);
+    try {
+      return json.decode(response.body);
+    } catch (e) {
+      print("API GET decode error: $e");
+      return {'status': 'fail', 'message': response.body};
+    }
+  }
+
+  static Future<Map<String, dynamic>> post(String url, Map<String, dynamic> data, {String? token}) async {
     final headers = {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
@@ -12,19 +26,14 @@ class ApiService {
     final response = await http.post(
       Uri.parse(url),
       headers: headers,
-      body: jsonEncode(body),
+      body: json.encode(data),
     );
 
-    return jsonDecode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> get(String url, {String? token}) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-
-    final response = await http.get(Uri.parse(url), headers: headers);
-    return jsonDecode(response.body);
+    try {
+      return json.decode(response.body);
+    } catch (e) {
+      print("API POST decode error: $e");
+      return {'status': 'fail', 'message': response.body};
+    }
   }
 }

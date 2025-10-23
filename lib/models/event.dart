@@ -1,28 +1,22 @@
 class Event {
-  String eventId;
-  String title;
-  String description;
-  String eventDate;
-  String reccurence;
-  String? groupId;
+  final String id;
+  final String title;
+  final String reccurence;
+  final String eventDate;
 
   Event({
-    required this.eventId,
+    required this.id,
     required this.title,
-    required this.description,
-    required this.eventDate,
     required this.reccurence,
-    this.groupId,
+    required this.eventDate,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
-      eventId: json['eventId'],
-      title: json['title'],
-      description: json['description'],
-      eventDate: json['eventDate'],
-      reccurence: json['reccurence'],
-      groupId: json['groupId'],
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      reccurence: json['reccurence'] ?? '',
+      eventDate: json['eventDate'] ?? '',
     );
   }
 }

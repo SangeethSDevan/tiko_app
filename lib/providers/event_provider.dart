@@ -10,16 +10,30 @@ class EventProvider extends ChangeNotifier {
   Future<void> fetchPersonalEvents(String token) async {
     final res = await ApiService.get(PERSONAL_EVENTS_URL, token: token);
     if (res['status'] == 'success') {
-      _personalEvents = List<Event>.from(res['events'].map((e) => Event.fromJson(e)));
+      _personalEvents = List<Event>.from(
+        res['events'].map((e) => Event.fromJson(e)),
+      );
       notifyListeners();
+    } else {
+      print("Failed to fetch events: ${res['message']}");
     }
   }
 
-  Future<void> createEvent(Map<String, dynamic> eventData, String token) async {
-    final res = await ApiService.post('${BASE_URL}/event', eventData, token: token);
+  Future<bool> createEvent(Map<String, dynamic> eventData, String token) async {
+    final res = await ApiService.post(
+      CREATE_EVENT_URL,
+      eventData,
+      token: token,
+    );
+    print("Create Event Response: $res");
+
     if (res['status'] == 'success') {
       _personalEvents.add(Event.fromJson(res['event']));
       notifyListeners();
+      return true;
+    } else {
+      print("Event creation failed: ${res['message']}");
+      return false;
     }
   }
 }

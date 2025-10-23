@@ -8,6 +8,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> login(String credential, String password) async {
     final res = await ApiService.post(LOGIN_URL, {'credential': credential, 'password': password});
+    print("Login response: $res");
     if (res['status'] == 'success') {
       token = res['token'];
       notifyListeners();
@@ -23,7 +24,7 @@ class AuthProvider extends ChangeNotifier {
       'email': email,
       'password': password,
     });
-
+    print("Signup response: $res");
     if (res['status'] == 'success') {
       token = res['token'];
       notifyListeners();
