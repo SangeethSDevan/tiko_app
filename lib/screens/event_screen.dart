@@ -83,40 +83,145 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Event")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: theme.colorScheme.background,
+      appBar: AppBar(
+        title: const Text("Create Event"),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF111827)),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: "Event Title"),
+            // Heading Tile
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 20),
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Icon(Icons.event_note,
+                          color: theme.colorScheme.primary, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        "Plan your next reminder",
+                        style: theme.textTheme.titleMedium!.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            TextFormField(
-              controller: _descController,
-              decoration: const InputDecoration(labelText: "Description"),
+
+            // Event Details Card
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+              color: Colors.white,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        labelText: "Event Title",
+                        prefixIcon: Icon(Icons.title_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descController,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                        labelText: "Description",
+                        prefixIcon: Icon(Icons.description_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _dateController,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        labelText: "Event Date",
+                        prefixIcon: Icon(Icons.calendar_today_outlined),
+                      ),
+                      onTap: _selectDate,
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownButtonFormField<String>(
+                      value: _recurrence,
+                      items: ["NONE", "DAILY", "WEEKLY", "MONTHLY","YEARLY"]
+                          .map((e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ))
+                          .toList(),
+                      decoration: const InputDecoration(
+                        labelText: "Recurrence",
+                        prefixIcon: Icon(Icons.repeat_outlined),
+                      ),
+                      onChanged: (v) => setState(() => _recurrence = v!),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            TextFormField(
-              controller: _dateController,
-              decoration: const InputDecoration(labelText: "Event Date"),
-              readOnly: true,
-              onTap: _selectDate,
-            ),
-            DropdownButton<String>(
-              value: _recurrence,
-              items: ["NONE", "DAILY", "WEEKLY", "MONTHLY"]
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (v) => setState(() => _recurrence = v!),
-            ),
-            const SizedBox(height: 20),
-            isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () => _createEvent(context),
-                    child: const Text("Create Event"),
+
+            const SizedBox(height: 30),
+
+            // Action Button Tile
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              color: theme.colorScheme.primary,
+              elevation: 1,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: isLoading ? null : () => _createEvent(context),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  child: Center(
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            "Create Event",
+                            style: theme.textTheme.titleMedium!.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -113,8 +113,8 @@ class _GroupEventsScreenState extends State<GroupEventsScreen> {
               itemBuilder: (context, index) {
                 final group = groups[index];
                 return ListTile(
-                  title: Text(group.groupName ?? "Unnamed Group"),
-                  subtitle: Text(group.description ?? ""),
+                  title: Text(group.groupName),
+                  subtitle: Text(group.description ?? "Description not added!"),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     Navigator.push(

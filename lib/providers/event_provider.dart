@@ -18,15 +18,18 @@ class EventProvider extends ChangeNotifier {
     try {
       final res = await ApiService.get(PERSONAL_EVENTS_URL, token: token);
       if (res['status'] == 'success') {
-        _personalEvents = List<Event>.from(
-          res['events'].map((e) => Event.fromJson(e)),
-        );
+        final eventsList = res['events'] as List<dynamic>?;
+        _personalEvents = eventsList != null
+            ? eventsList.map((e) => Event.fromJson(e)).toList()
+            : [];
         notifyListeners();
       } else {
         print("Failed to fetch personal events: ${res['message']}");
+        _personalEvents = [];
       }
     } catch (e) {
       print("Error fetching personal events: $e");
+      _personalEvents = [];
     }
   }
 
@@ -35,30 +38,37 @@ class EventProvider extends ChangeNotifier {
     try {
       final res = await ApiService.get(GROUPS_URL, token: token);
       if (res['status'] == 'success') {
-        _groups = List<Group>.from(res['groups'].map((g) => Group.fromJson(g)));
+        final groupsList = res['groups'] as List<dynamic>?;
+        _groups = groupsList != null
+            ? groupsList.map((g) => Group.fromJson(g)).toList()
+            : [];
         notifyListeners();
       } else {
         print("Failed to fetch groups: ${res['message']}");
+        _groups = [];
       }
     } catch (e) {
       print("Error fetching groups: $e");
+      _groups = [];
     }
   }
 
   /// Fetch events for a specific group
   Future<void> fetchGroupEvents(String token, String groupId) async {
     try {
-      final res = await ApiService.get('$BASE_URL/group/$groupId/events', token: token);
+      final res = await ApiService.get('$BASE_URL/group/$groupId', token: token);
       if (res['status'] == 'success') {
-        _groupEvents = List<Event>.from(
-          res['events'].map((e) => Event.fromJson(e)),
-        );
+        final eventsList = res['data']['events'] as List<dynamic>?;
+        _groupEvents =
+            eventsList != null ? eventsList.map((e) => Event.fromJson(e)).toList() : [];
         notifyListeners();
       } else {
         print("Failed to fetch group events: ${res['message']}");
+        _groupEvents = [];
       }
     } catch (e) {
       print("Error fetching group events: $e");
+      _groupEvents = [];
     }
   }
 
@@ -70,13 +80,16 @@ class EventProvider extends ChangeNotifier {
       print("Create Event Response: $res");
 
       if (res['status'] == 'success') {
-        Event event = Event.fromJson(res['event']);
-        if (eventData.containsKey("groupId")) {
-          _groupEvents.add(event);
-        } else {
-          _personalEvents.add(event);
+        final eventJson = res['event'] as Map<String, dynamic>?;
+        if (eventJson != null) {
+          Event event = Event.fromJson(eventJson);
+          if (eventData.containsKey("groupId")) {
+            _groupEvents.add(event);
+          } else {
+            _personalEvents.add(event);
+          }
+          notifyListeners();
         }
-        notifyListeners();
         return true;
       } else {
         print("Event creation failed: ${res['message']}");
@@ -91,9 +104,7 @@ class EventProvider extends ChangeNotifier {
   /// Create a new group
   Future<bool> createGroup(String groupName, String token, {String? description}) async {
     try {
-      final body = {
-        'groupName': groupName,
-      };
+      final body = {'groupName': groupName};
       if (description != null) {
         body['description'] = description;
       }
@@ -102,9 +113,12 @@ class EventProvider extends ChangeNotifier {
       print("Create Group Response: $res");
 
       if (res['status'] == 'success') {
-        _groups.add(Group.fromJson(res['group']));
-        notifyListeners();
-        return true;
+        final groupJson = res['group'] as Map<String, dynamic>?;
+        if (groupJson != null) {
+          _groups.add(Group.fromJson(groupJson));
+          notifyListeners();
+          return true;
+        }
       }
     } catch (e) {
       print("Error creating group: $e");

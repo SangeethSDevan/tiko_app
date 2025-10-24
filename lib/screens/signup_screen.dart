@@ -43,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    "Create Account",
+                    "Create Account with TIKO",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
@@ -54,12 +54,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     validator: (v) =>
                         v == null || v.isEmpty ? 'Enter full name' : null,
                   ),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: _usernameController,
                     decoration: const InputDecoration(labelText: 'Username'),
                     validator: (v) =>
                         v == null || v.isEmpty ? 'Enter username' : null,
                   ),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(labelText: 'Email'),
@@ -69,6 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,

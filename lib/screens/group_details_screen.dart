@@ -56,7 +56,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
               onPressed: () async {
                 if (memberController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Please enter member info"))
+                    const SnackBar(content: Text("Please enter member info")),
                   );
                   return;
                 }
@@ -74,9 +74,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success
-                        ? "Member added successfully"
-                        : "Failed to add member"),
+                    content: Text(
+                      success
+                          ? "Member added successfully"
+                          : "Failed to add member",
+                    ),
                   ),
                 );
               },
@@ -120,24 +122,65 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : events.isEmpty
-              ? const Center(child: Text("No group events"))
-              : ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    Event event = events[index];
-                    String eventDate;
-                    try {
-                      eventDate =
-                          "${event.reccurence} | ${DateTime.parse(event.eventDate).toLocal().toIso8601String().split('T')[0]}";
-                    } catch (_) {
-                      eventDate = "${event.reccurence} | Invalid date";
-                    }
-                    return ListTile(
-                      title: Text(event.title),
-                      subtitle: Text(eventDate),
-                    );
+          ? const Center(child: Text("No group events"))
+          : ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                Event event = events[index];
+                String eventDate;
+                try {
+                  eventDate =
+                      "${event.reccurence} | ${DateTime.parse(event.eventDate).toLocal().toIso8601String().split('T')[0]}";
+                } catch (_) {
+                  eventDate = "${event.reccurence} | Invalid date";
+                }
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  tileColor: Colors.grey[100],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: const Icon(Icons.event, color: Colors.black),
+                  title: Text(
+                    event.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      eventDate,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  onTap: () {
+                    // Your navigation or action
                   },
-                ),
+                );
+              },
+            ),
     );
   }
 }
