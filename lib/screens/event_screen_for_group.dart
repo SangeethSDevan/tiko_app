@@ -4,14 +4,16 @@ import '../providers/event_provider.dart';
 import '../providers/auth_provider.dart';
 import 'package:intl/intl.dart';
 
-class EventScreen extends StatefulWidget {
-  const EventScreen({super.key});
+class EventScreenForGroup extends StatefulWidget {
+  final String groupId;
+
+  const EventScreenForGroup({super.key, required this.groupId});
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<EventScreenForGroup> createState() => _EventScreenForGroupState();
 }
 
-class _EventScreenState extends State<EventScreen> {
+class _EventScreenForGroupState extends State<EventScreenForGroup> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   final _dateController = TextEditingController();
@@ -38,7 +40,7 @@ class _EventScreenState extends State<EventScreen> {
     }
   }
 
-  Future<void> _createEvent(BuildContext context) async {
+  Future<void> _createGroupEvent(BuildContext context) async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final eventProvider = Provider.of<EventProvider>(context, listen: false);
 
@@ -59,6 +61,7 @@ class _EventScreenState extends State<EventScreen> {
       "description": _descController.text.trim(),
       "reccurence": _recurrence,
       "eventDate": isoDate,
+      "groupId": widget.groupId,
     };
 
     bool success = await eventProvider.createEvent(eventData, auth.token!);
@@ -67,37 +70,32 @@ class _EventScreenState extends State<EventScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Event created successfully")),
+        const SnackBar(content: Text("Group event created successfully")),
       );
-      _titleController.clear();
-      _descController.clear();
-      _dateController.clear();
-      await eventProvider.fetchPersonalEvents(auth.token!);
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Event creation failed")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Event creation failed")));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Create Event")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AlertDialog(
+      title: const Text("Create Group Event"),
+      content: SingleChildScrollView(
         child: Column(
           children: [
-            TextFormField(
+            TextField(
               controller: _titleController,
               decoration: const InputDecoration(labelText: "Event Title"),
             ),
-            TextFormField(
+            TextField(
               controller: _descController,
               decoration: const InputDecoration(labelText: "Description"),
             ),
-            TextFormField(
+            TextField(
               controller: _dateController,
               decoration: const InputDecoration(labelText: "Event Date"),
               readOnly: true,
@@ -105,21 +103,29 @@ class _EventScreenState extends State<EventScreen> {
             ),
             DropdownButton<String>(
               value: _recurrence,
-              items: ["NONE", "DAILY", "WEEKLY", "MONTHLY"]
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
+              items: [
+                "NONE",
+                "DAILY",
+                "WEEKLY",
+                "MONTHLY",
+              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: (v) => setState(() => _recurrence = v!),
             ),
-            const SizedBox(height: 20),
-            isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () => _createEvent(context),
-                    child: const Text("Create Event"),
-                  ),
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: isLoading ? null : () => _createGroupEvent(context),
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : const Text("Create"),
+        ),
+      ],
     );
   }
 }
